@@ -5,6 +5,7 @@ int gcd(int u, int v){
     /* u-u/v*v == u mod v */
 }
 
+
 void main(void)
 {   int x;
     int y;
@@ -12,3 +13,7 @@ void main(void)
     y = input();
     output( gcd(x,y) );
 }
+
+123434
+
+1voi3

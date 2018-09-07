@@ -12,12 +12,12 @@ class TokenType(Enum):
     WHILE = 6#'while'
     PLUS = 7#'+'
     MINUS = 8#'-'
-    MULTIPLICATION = 9#'*'
+    ASTERISK = 9#'*'
     SLASH = 10#'/'
     LESS_THAN = 11#'<'
-    LESS_EQUAL = 12#'<='
+    LESS_THAN_EQUAL_TO = 12#'<='
     GREATER_THAN = 13#'>'
-    GREATER_EQUAL = 14#'>='
+    GREATER_THAN_EQUAL_TO = 14#'>='
     EQUAL = 15#'=='
     DIFFERENT = 16#'!='
     ASSIGNMENT = 17#'='
@@ -33,3 +33,4 @@ class TokenType(Enum):
     CLOSE_COMMENT = 27#'*/'
     ID = 28
     NUM = 29
+    ERROR = 30
