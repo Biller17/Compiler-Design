@@ -15,9 +15,11 @@ def globales(prog, pos, long):
     progLong = long
 
 
-def printToken(TokenType, TokenVal, imprime, tokenLen):
+def printToken(TokenType, TokenVal, imprime, tokenLen, errorMSG = ""):
     global posicion
     posicion += tokenLen
+    if(TokenVal == 'error'):
+        printError(posicion, errorMSG)
     if(imprime):
         print("(", TokenType, ",", TokenVal, ")")
     return(TokenType, TokenVal)
@@ -39,8 +41,39 @@ def checkIfKeyWord(token, imprime, idsize):
         return(printToken(TokenType.ID, token, imprime, idsize))
 
 
+def printError(posicion, errorMSG):
+    linePos = posicion
+    print("Linea : ", errorMSG )
+    while(True):
+        linePos -= 1
+        if(programa[linePos] == '\n'):
+            break
+    while(True):
+        linePos += 1
+        if(programa[linePos] == '\n'):
+            break
+        print(programa[linePos], end= "")
+    print("\n")
+
+
+
+
 def getToken(imprime = True):
     global posicion
+
+    while(programa[posicion] == ' ' or programa[posicion] == '\n' or programa[posicion]== '\t'):
+        posicion += 1
+
+
+
+    if(programa[posicion] == '/'):
+        if(programa[posicion+1] == '*'):
+            while(True):
+                posicion += 1
+                if(programa[posicion] == '*'):
+                    if(programa[posicion+1] == '/'):
+                        posicion+= 2
+                        break
 
     while(programa[posicion] == ' ' or programa[posicion] == '\n' or programa[posicion]== '\t'):
         posicion += 1
@@ -80,13 +113,14 @@ def getToken(imprime = True):
         return (printToken(TokenType.GREATER_THAN, '>', imprime, 1))
 
     elif(programa[posicion] == '*'):
-        if(programa[posicion+1] == '/'):
-            return (printToken(TokenType.CLOSE_COMMENT, '*/', imprime, 2))
+        # if(programa[posicion+1] == '/'):
+        #     return (printToken(TokenType.CLOSE_COMMENT, '*/', imprime, 2))
         return (printToken(TokenType.ASTERISK, '*', imprime, 1))
 
     elif(programa[posicion] == '/'):
-        if(programa[posicion+1] == '*'):
-            return (printToken(TokenType.OPEN_COMMENT, '/*', imprime, 2))
+        # if(programa[posicion+1] == '*'):
+        #
+        #     return (printToken(TokenType.OPEN_COMMENT, '/*', imprime, 2))
         return (printToken(TokenType.SLASH, '/', imprime, 1))
 
     elif(programa[posicion] == '='):
