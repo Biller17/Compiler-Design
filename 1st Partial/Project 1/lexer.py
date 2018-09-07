@@ -117,7 +117,6 @@ def getToken(imprime = True):
         idsize = 1
         token = programa[posicion]
         while(True):
-            print(programa[posicion + idsize])
             if(programa[posicion+idsize].isdigit()):
                 token += programa[posicion + idsize]
                 idsize +=1
@@ -127,11 +126,12 @@ def getToken(imprime = True):
                         return(printToken(TokenType.ERROR, 'error', imprime, idsize))
                     else:
                         idsize += 1
+            else:
+                break
 
 
 
-
-            return(printToken(TokenType.NUM, token, imprime, idsize))
+        return(printToken(TokenType.NUM, token, imprime, idsize))
 
 
 
