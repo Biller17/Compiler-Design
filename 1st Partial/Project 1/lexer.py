@@ -121,6 +121,7 @@ def getToken(imprime = True):
                 token += programa[posicion + idsize]
                 idsize +=1
             elif(programa[posicion + idsize].isalpha()):
+                pos = posicion + idsize
                 while(True):
                     if(programa[posicion+idsize] == ' ' or programa[posicion+idsize] == '\n' or programa[posicion+idsize] == '\t'):
                         return(printToken(TokenType.ERROR, 'error', imprime, idsize))
