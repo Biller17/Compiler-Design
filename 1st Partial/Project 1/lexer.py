@@ -15,15 +15,17 @@ def globales(prog, pos, long):
     progLong = long
 
 
-def printToken(TokenType, TokenVal, imprime, tokenLen, errorMSG = ""):
+def printToken(TokenType, TokenVal, imprime, tokenLen, errorMSG = "", errorpos = 0):
     global posicion
     posicion += tokenLen
     if(TokenVal == 'error'):
-        printError(posicion, errorMSG)
+        printError(errorpos, errorMSG)
     if(imprime):
         print("(", TokenType, ",", TokenVal, ")")
     return(TokenType, TokenVal)
 
+
+#function that receives a token value and determines if it's a reserved word or a normal id
 def checkIfKeyWord(token, imprime, idsize):
     if(token == 'else'):
         return (printToken(TokenType.ELSE, token, imprime, idsize))
@@ -40,7 +42,7 @@ def checkIfKeyWord(token, imprime, idsize):
     else:
         return(printToken(TokenType.ID, token, imprime, idsize))
 
-
+#receives message and position to print error message
 def printError(posicion, errorMSG):
     linePos = posicion
     print("Linea : ", errorMSG )
@@ -48,12 +50,22 @@ def printError(posicion, errorMSG):
         linePos -= 1
         if(programa[linePos] == '\n'):
             break
+    pointer = linePos
     while(True):
         linePos += 1
         if(programa[linePos] == '\n'):
             break
         print(programa[linePos], end= "")
     print("\n")
+    while(True):
+        if(pointer == posicion-1):
+            print("^")
+            break
+        else:
+            print(" ", end="")
+        pointer +=1
+
+
 
 
 
@@ -132,7 +144,8 @@ def getToken(imprime = True):
         if(programa[posicion+1] == '='):
             return (printToken(TokenType.DIFFERENT, '!=', imprime, 2))
         else:
-            return(printToken(TokenType.ERROR, 'error', imprime, 1))
+            return(printToken(TokenType.ERROR, 'error', imprime, 2, "Error en la formacion de expresion", posicion))
+            # return(printToken(TokenType.ERROR, 'error', imprime, 1))
 
     #checking if its id
     elif(programa[posicion].isalpha()):
@@ -156,9 +169,10 @@ def getToken(imprime = True):
                 idsize +=1
             elif(programa[posicion + idsize].isalpha()):
                 pos = posicion + idsize
+                errorpos = posicion + idsize
                 while(True):
                     if(programa[posicion+idsize] == ' ' or programa[posicion+idsize] == '\n' or programa[posicion+idsize] == '\t'):
-                        return(printToken(TokenType.ERROR, 'error', imprime, idsize))
+                        return(printToken(TokenType.ERROR, 'error', imprime, idsize, "Error en la formacion de un entero", errorpos))
                     else:
                         idsize += 1
             else:

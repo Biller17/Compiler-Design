@@ -14,6 +14,8 @@ void main(void)
     output( gcd(x,y) );
 }
 
+!2
+
 123434
 !=,232a
 1voi3
