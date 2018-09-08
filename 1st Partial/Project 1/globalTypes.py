@@ -1,6 +1,8 @@
 from enum import Enum
 
 
+
+#tokentype class with all enum tokens
 class TokenType(Enum):
 
     ENDFILE = '$'

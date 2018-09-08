@@ -15,6 +15,8 @@ def globales(prog, pos, long):
     progLong = long
 
 
+#function that returns the tuple value and prints token depending on parameters
+#if it receives an error then calls print error function
 def printToken(TokenType, TokenVal, imprime, tokenLen, errorMSG = "", errorpos = 0):
     global posicion
     posicion += tokenLen
@@ -69,15 +71,15 @@ def printError(posicion, errorMSG):
 
 
 
-
+#this function reads the whole program to
 def getToken(imprime = True):
     global posicion
-
+    #ignoring any space newline or tab character
     while(programa[posicion] == ' ' or programa[posicion] == '\n' or programa[posicion]== '\t'):
         posicion += 1
 
 
-
+    #ignoring comments
     if(programa[posicion] == '/'):
         if(programa[posicion+1] == '*'):
             while(True):
@@ -160,6 +162,7 @@ def getToken(imprime = True):
         return (checkIfKeyWord(token, imprime, idsize))
         # return(printToken(TokenType.ID, token, imprime, idsize))
 
+#checking if its number
     elif(programa[posicion].isdigit()):
         idsize = 1
         token = programa[posicion]
