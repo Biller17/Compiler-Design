@@ -72,7 +72,7 @@ def printError(posicion, errorMSG):
 
 
 #this function reads the whole program to
-def getToken(imprime = True):
+def getToken(imprime = False):
     global posicion
     #ignoring any space newline or tab character
     while(programa[posicion] == ' ' or programa[posicion] == '\n' or programa[posicion]== '\t'):
