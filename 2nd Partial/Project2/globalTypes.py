@@ -31,6 +31,6 @@ class TokenType(Enum):
     CLOSE_BRACKETS = ']'
     OPEN_KEYS = '{'
     CLOSE_KEYS = '}'
-    ID = ''
-    NUM = ''
+    ID = 'ID'
+    NUM = 'NUM'
     ERROR = 'error'
