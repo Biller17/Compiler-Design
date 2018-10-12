@@ -61,7 +61,8 @@ def parseFunDeclaration():
     params = parseParams()
     if(params):
         childNodes.append(params)
-        if(nextToken == TokenType.CLOSE_PARENTHESIS):
+        global currentToken
+        if(currentToken == TokenType.CLOSE_PARENTHESIS):
             childNodes.append(Node(")"))
             compoundStmt = parseCompountStmt()
             if(compoundStmt):
@@ -85,6 +86,12 @@ def parseVarDeclaration():
                     return childNodes
     return None
 
+
+def parseParams():
+    if(nextToken() == TokenType.CLOSE_PARENTHESIS):
+        return(Node("void"))
+    else:
+        
 
 
 
