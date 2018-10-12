@@ -60,15 +60,14 @@ def parseFunDeclaration():
     childNodes = [Node("(")]
     params = parseParams()
     if(params):
-        childNodes.append(params)
-        global currentToken
-        if(currentToken == TokenType.CLOSE_PARENTHESIS):
-            childNodes.append(Node(")"))
-            compoundStmt = parseCompountStmt()
-            if(compoundStmt):
-                childNodes.append(compoundStmt)
-                return childNodes
+        childNodes.append(Node("params", params))
+        childNodes.append(Node(")"))
+        compoundStmt = parseCompountStmt()
+        if(compoundStmt):
+            childNodes.append(compoundStmt)
+            return childNodes
     return None
+
 
 def parseVarDeclaration():
     childNodes = []
@@ -88,10 +87,27 @@ def parseVarDeclaration():
 
 
 def parseParams():
-    if(nextToken() == TokenType.CLOSE_PARENTHESIS):
-        return(Node("void"))
-    else:
-        
+    return([parseDeclaration()].append(parseDeclarationList()))
+
+
+
+def parseParam():
+    childNodes = []
+    typeSpecifier = parseTypeSpecifier()
+    if(typeSpecifier):
+        childNodes.append(typeSpecifier)
+        if(nextToken() == TokenType.ID):
+            childNodes.append(Node("ID"))
+            if(nextToken() == TokenType.OPEN_BRACKETS):
+                childNodes.append(Node("["))
+                if(nextToken() == TokenType.NUM):
+                    childNodes.append(Node("NUM"))
+                    if(nextToken() == TokenType.CLOSE_BRACKETS):
+                        childNodes.append(Node("]"))
+                        return childNodes
+            elif:
+    return None
+
 
 
 
