@@ -4,6 +4,9 @@ from lexer import *
 tokenList = []
 currentToken = -1
 
+#parser code parsing lexer for c- code
+#Adrian Biller a01018940
+
 class Node:
     def __init__(self, type, childNodes = None, value =None):
         self.type = type
