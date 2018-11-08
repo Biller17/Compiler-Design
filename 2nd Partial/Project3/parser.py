@@ -14,7 +14,7 @@ class Node:
             self.childNodes = []
 
     def printTree(self, level = 0):
-        print(level*'__', self.type)
+        print((level*3)*'__', self.type)
         # print(self.childNodes)
         if(self.childNodes != []):
             if(type(self.childNodes) == Node):
@@ -54,7 +54,8 @@ def parseProgram():
 def parseDeclarationList():
     # if(tokenList[currentToken + 1] == TokenType.ENDFILE):
     #     return []
-
+    # for i in range(len(tokenList)):
+    #     print(tokenList[i])
     childNodes = []
     while(True):
         if(tokenList[currentToken + 1] == TokenType.ENDFILE):
@@ -177,7 +178,6 @@ def parseParam():
 def parseCompoundStmt():
     childNodes = []
     if(nextToken() == TokenType.OPEN_KEYS):
-        #
         childNodes.append(Node("{"))
         local = parseLocalDeclarations()
         if(local):
@@ -199,6 +199,7 @@ def parseLocalDeclarations():
         tmp = parseLocalVarDeclaration()
         if(tmp):
             childNodes.append(tmp)
+            currentPos = currentToken
         else:
             currentToken = currentPos
             break
@@ -268,7 +269,7 @@ def parseExpressionStmt():
     global currentToken
     childNodes = []
     if(nextToken() == TokenType.SEMICOLON):
-        return(Node("expression-stmt", [Node(";")]))
+        return(Node(";"))
     else:
         currentToken -= 1
         exp = parseExpression()
@@ -342,13 +343,11 @@ def parseReturnStmt():
     return None
 
 def parseExpression():
-
     childNodes = []
     global currentToken
     currentPos = currentToken
     var = parseVar()
     if(var):
-
         childNodes.append(var)
         if(nextToken() == TokenType.ASSIGNMENT):
             childNodes.append(Node("="))
@@ -518,6 +517,7 @@ def parseFactor():
     currentToken = currentPos
     call = parseCall()
     if(call):
+        print(currentToken)#--------------------------------------------------------------------------------
         childNodes.append(call)
         return(Node("factor", childNodes))
 

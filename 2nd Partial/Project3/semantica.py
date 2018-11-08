@@ -1,8 +1,12 @@
+from parser import *
+
+
 
 
 
 
 def tabla( AST, imprime = True):
+    
     return 0
 
 def semantica(AST, imprime = True):
