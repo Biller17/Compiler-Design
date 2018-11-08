@@ -4,34 +4,61 @@ from parser import *
 #programa analizador de semantica Adrian Biller A01018940
 
 
-class ScopeNode:
+class Scope:
     def __init__(self, level):
         self.level = level
-        self.symbolTable = []
-        self.childScope = []
+        self.symbolTable = {}
+        self.childScopes = []
 
 
-    def generateSymbolTable():
-        
 
-    def printTree(self, level = 0):
-        print((level*3)*'__', self.type)
-        # print(self.childNodes)
-        if(self.childNodes != []):
-            if(type(self.childNodes) == Node):
-                self.childNodes.printTree()
+
+
+def generateST(ast, table, currentScope, scopeLevel = 0):
+    '''Checking if node is
+    variable definition
+    variable definition (array)
+    function definition'''
+    # print((scopeLevel*3)*'__', ast.type, ast.value)
+    if(ast.childNodes != []):
+        for i in range(len(ast.childNodes)):
+            if(type(ast.childNodes[i]) == list):
+                for j in range(len(ast.childNodes[i])):
+                    generateST(ast.childNodes[i][j], table,currentScope, scopeLevel +1)
             else:
-                for i in range(len(self.childNodes)):
-                    if(type(self.childNodes[i]) == list):
-                        for j in range(len(self.childNodes[i])):
-                            self.childNodes[i][j].printTree()
-                    else:
-                        self.childNodes[i].printTree(level+1)
+                if(ast.childNodes[i].type == "fun-declaration"):
+                    print("******************************************            fun")
+                    #get function type id and params into symbolTable
+                    getFunctionProps(ast.childNodes[i])
+                    #create new scope and add function type, id and params
+                    #use function recursively and check in new scope
+
+                elif(ast.childNodes[i].type == "var-declaration"):
+                    print("ñññññññññññññññññññññññññññññññññññññññññ             var")
+                    #get all variables declared and put them in the current scope
+                generateST(ast.childNodes[i],table,currentScope, scopeLevel+1)
+
+
+
+def getFunctionProps(node):
+    #function type
+    print("function type", node.childNodes[0].type)
+    #function id
+    print("function id", node.childNodes[1].type)
+
+
+    #getting params
+    print("param", node.childNodes[2][1].childNodes[0].type)
+
 
 
 
 def tabla( AST, imprime = True):
+    initialScope = Scope(0)
+    dict = {}
+    generateST(AST, dict, initialScope)
     return 0
+
 
 
 
