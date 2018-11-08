@@ -42,8 +42,10 @@ def getLastToken():
 
 def parser(imprime = True):
     # print(tokenList)
+    initialConf()
     AST = parseProgram()
-    AST.printTree(0)
+    if(imprime == True):
+        AST.printTree(0)
     return AST
 
 
@@ -517,7 +519,7 @@ def parseFactor():
     currentToken = currentPos
     call = parseCall()
     if(call):
-        print(currentToken)#--------------------------------------------------------------------------------
+        # print(currentToken)#--------------------------------------------------------------------------------
         childNodes.append(call)
         return(Node("factor", childNodes))
 
@@ -577,8 +579,7 @@ def parseArgList():
 
 
 
-if __name__ == '__main__':
-
+def initialConf():
     print("starting parser")
     f = open('sample.txt', 'r')
     programa = f.read()     # lee todo el archivo a compilar
@@ -595,4 +596,6 @@ if __name__ == '__main__':
             break
 
 
+
+if __name__ == '__main__':
     AST = parser(True)
