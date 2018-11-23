@@ -2,6 +2,7 @@ from globalTypes import *
 from lexer import *
 
 tokenList = []
+tokenListValues = []
 currentToken = -1
 
 class Node:
@@ -78,7 +79,7 @@ def parseDeclaration():
     if(type):
         childNodes.append(type)
         if(nextToken() == TokenType.ID):
-            childNodes.append(Node("ID"))
+            childNodes.append(Node("ID", [], tokenListValues[currentToken]))
             if(nextToken() == TokenType.OPEN_PARENTHESIS):
                 fun = parseFunDeclaration()
                 if(fun):
@@ -163,7 +164,7 @@ def parseParam():
                 return(Node("void"))
         childNodes.append(typeSpecifier)
         if(nextToken() == TokenType.ID):
-            childNodes.append(Node("ID"))
+            childNodes.append(Node("ID", [], tokenListValues[currentToken]))
             if(nextToken() == TokenType.OPEN_BRACKETS):
                 childNodes.append(Node("["))
                 if(nextToken() == TokenType.CLOSE_BRACKETS):
@@ -216,7 +217,7 @@ def parseLocalVarDeclaration():
     if(type):
         childNodes.append(type)
         if(nextToken() == TokenType.ID):
-            childNodes.append(Node("ID"))
+            childNodes.append(Node("ID", [], tokenListValues[currentToken]))
             tmp = parseVarDeclaration()
             if(tmp):
                 childNodes.append(tmp)
@@ -271,13 +272,13 @@ def parseExpressionStmt():
     global currentToken
     childNodes = []
     if(nextToken() == TokenType.SEMICOLON):
-        return(Node(";"))
+        return([Node(";")])
     else:
         currentToken -= 1
         exp = parseExpression()
         if(exp):
             childNodes.append([exp, Node(";")])
-            return(Node("expression-stmt", childNodes))
+            return([Node("expression-stmt", childNodes)])
     return None
 
 def parseSelectionStmt():
@@ -300,11 +301,11 @@ def parseSelectionStmt():
                             stmt = parseStatement()
                             if(stmt):
                                 childNodes.append(stmt)
-                                return(Node("selection-stmt", childNodes))
+                                return([Node("selection-stmt", childNodes)])
                         else:
 
                             currentToken -= 1
-                            return(Node("selection-stmt", childNodes))
+                            return([Node("selection-stmt", childNodes)])
     return None
 
 
@@ -332,7 +333,7 @@ def parseReturnStmt():
         childNodes.append(Node("return"))
         if(nextToken() ==  TokenType.SEMICOLON):
             childNodes.append(Node(";"))
-            return(Node("return-stmt", childNodes))
+            return([Node("return-stmt", childNodes)])
         else:
 
             currentToken -= 1
@@ -341,7 +342,7 @@ def parseReturnStmt():
             if(exp):
                 if(nextToken() == TokenType.SEMICOLON):
                     childNodes.append([exp, Node(";")])
-                    return(Node("return-stmt", childNodes))
+                    return([Node("return-stmt", childNodes)])
     return None
 
 def parseExpression():
@@ -369,7 +370,7 @@ def parseVar():
     global currentToken
     childNodes = []
     if(nextToken() == TokenType.ID):
-        childNodes.append(Node("ID"))
+        childNodes.append(Node("ID", [], tokenListValues[currentToken]))
         if(nextToken() == TokenType.OPEN_BRACKETS):
             childNodes.append(Node("["))
             exp = parseExpression()
@@ -534,7 +535,7 @@ def parseFactor():
 def parseCall():
     childNodes = []
     if(nextToken() == TokenType.ID):
-        childNodes.append(Node("ID"))
+        childNodes.append(Node("ID", [], tokenListValues[currentToken]))
         if(nextToken() == TokenType.OPEN_PARENTHESIS):
             childNodes.append(Node("("))
             args = parseArgs()
@@ -592,6 +593,7 @@ def initialConf():
     while (True):
         token = getToken()
         tokenList.append(token[0])
+        tokenListValues.append(token[1])
         if(token[0] == TokenType.ENDFILE):
             break
 
