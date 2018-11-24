@@ -1,4 +1,25 @@
-def codeGen(tree, file):
+from semantica import *
+
+opKind =  [ 'PLUS', 'MINUS', 'TIMES', 'OVER', 'ASSIGN' ]
+compareKind = [ 'EQ', 'DF', 'GET', ',LET', 'GT', 'LT' ]
+evaluationKind = ['IF', 'WHILE']
+
+
+def codeGen(tree, file, level):
+    print((level*3)*'__', tree.type, " # ", tree.value)
+    if type(tree.childNodes) == list:
+        for i in range(len(tree.childNodes)):
+            if(type(tree.childNodes[i]) == list):
+                for j in range(len(tree.childNodes[i])):
+                    codeGen(tree.childNodes[i][j],file, level+1)
+            # if type(ast.childNodes[i]) == list:
+            #     generateST(ast.childNodes[i] , currentScope)
+            else:
+                codeGen(tree.childNodes[i],file, level +1)
+
+
+
+def codeGenREF(tree, file):
 	if tree:
 		# print('Nodo: {}. Tipo: {}'.format(tree.type, tree.tokenType))
 
@@ -124,6 +145,8 @@ def codeGen(tree, file):
 			codeGen(child, file)
 
 
-opKind =  [ 'PLUS', 'MINUS', 'TIMES', 'OVER', 'ASSIGN' ]
-compareKind = [ 'EQ', 'DF', 'GET', ',LET', 'GT', 'LT' ]
-evaluationKind = ['IF', 'WHILE']
+
+if __name__ == '__main__':
+    print("Generador de codigo Adrian Biller A01018940")
+    AST = sem()
+    codeGen(AST, "codeGenerated.txt", 0)

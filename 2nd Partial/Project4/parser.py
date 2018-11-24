@@ -102,7 +102,7 @@ def parseVarDeclaration():
     elif(nextToken() == TokenType.OPEN_BRACKETS):
         childNodes.append(Node("["))
         if(nextToken() == TokenType.NUM):
-            childNodes.append(Node("NUM"))
+            childNodes.append(Node("NUM",[], tokenListValues[currentToken]))
             if(nextToken() == TokenType.CLOSE_BRACKETS):
                 childNodes.append(Node("]"))
                 if(nextToken() == TokenType.SEMICOLON):
@@ -122,13 +122,13 @@ def parseTypeSpecifier():
 
 def parseFunDeclaration():
     # print("función", currentToken)
-    childNodes = [Node("(")]
+    # childNodes = [Node("(")]
+    childNodes = []
     params = parseParams()
-
     # print("_________",currentToken,"__________", tokenList[currentToken+1])
     if(params):
         childNodes.append(params)
-        childNodes.append(Node(")"))
+        # childNodes.append(Node(")"))
         compoundStmt = parseCompoundStmt()
         if(compoundStmt):
             childNodes.append(compoundStmt)
@@ -287,12 +287,12 @@ def parseSelectionStmt():
     if(nextToken() == TokenType.IF):
         childNodes.append(Node("if"))
         if(nextToken() == TokenType.OPEN_PARENTHESIS):
-            childNodes.append(Node("("))
+            # childNodes.append(Node("("))
             exp = parseExpression()
             if(exp):
                 childNodes.append(exp)
                 if(nextToken() == TokenType.CLOSE_PARENTHESIS):
-                    childNodes.append(Node(")"))
+                    # childNodes.append(Node(")"))
                     stmt = parseStatement()
                     if(stmt):
                         childNodes.append(stmt)
@@ -314,12 +314,12 @@ def parseIterationStmt():
     if(nextToken() == TokenType.WHILE):
         childNodes.append(Node("while"))
         if(nextToken() == TokenType.OPEN_PARENTHESIS):
-            childNodes.append(Node("("))
+            # childNodes.append(Node("("))
             exp = parseExpression()
             if(exp):
                 childNodes.append(exp)
                 if(nextToken() == TokenType.CLOSE_PARENTHESIS):
-                    childNodes.append(Node(")"))
+                    # childNodes.append(Node(")"))
                     stmt = parseStatement()
                     if(stmt):
                         childNodes.append(stmt)
@@ -442,6 +442,7 @@ def parseAdditiveExp():
 
 
 def parseAdditiveExpP():
+    global currentToken
     childNodes = []
     addop = parseAddOp()
     if(addop):
@@ -449,9 +450,13 @@ def parseAdditiveExpP():
         term = parseTerm()
         if(term):
             childNodes.append(term)
+            currentPos = currentToken
             add = parseAdditiveExpP()
             if(add):
                 childNodes.append(add)
+                return(Node("additive-expression",childNodes))
+            else:
+                currentToken = currentPos
                 return(Node("additive-expression",childNodes))
     else:
         return None
@@ -506,15 +511,15 @@ def parseFactor():
     childNodes = []
     currentPos = currentToken
     if(nextToken() == TokenType.OPEN_PARENTHESIS):
-        childNodes.append(Node("("))
+        # childNodes.append(Node("("))
         exp = parseExpression()
         if(exp):
             childNodes.append(exp)
             if(nextToken() == TokenType.CLOSE_PARENTHESIS):
-                childNodes.append(Node(")"))
+                # childNodes.append(Node(")"))
                 return(Node("factor", childNodes))
     elif(getLastToken() == TokenType.NUM):
-        childNodes.append(Node("num"))
+        childNodes.append(Node("num", [], tokenListValues[currentToken]))
         return(Node("factor", childNodes))
 
     currentToken = currentPos
@@ -537,11 +542,11 @@ def parseCall():
     if(nextToken() == TokenType.ID):
         childNodes.append(Node("ID", [], tokenListValues[currentToken]))
         if(nextToken() == TokenType.OPEN_PARENTHESIS):
-            childNodes.append(Node("("))
+            # childNodes.append(Node("("))
             args = parseArgs()
             childNodes.append(args)
             if(args):
-                childNodes.append(Node(")"))
+                # childNodes.append(Node(")"))
                 return(Node("call", childNodes))
     return None
 

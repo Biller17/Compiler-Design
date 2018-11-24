@@ -159,7 +159,8 @@ def getScopeArray(scope, scopearr):
             getScopeArray(scope.childScopes[i], scopearr)
     return scopearr
 
-if __name__ == '__main__':
+def sem():
     print("Analizador semantico Adrian Biller A01018940")
     AST = parser(False)
     semantica(AST)
+    return AST
