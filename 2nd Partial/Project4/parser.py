@@ -144,7 +144,7 @@ def parseParams():
         return None
     while(True):
         if(getLastToken() == TokenType.COMMA):
-            childNodes.append(Node(","))
+            # childNodes.append(Node(","))
             # print("_________",currentToken,"__________", tokenList[currentToken])
             param = parseParam()
             if(param):
@@ -485,24 +485,31 @@ def parseTerm():
     return None
 
 def parseTermP():
+    global currentToken
     childNodes = []
+    print(tokenList[currentToken+1])
     mulop = parseMulop()
     if(mulop):
         childNodes.append(mulop)
+
         factor = parseFactor()
         if(factor):
             childNodes.append(factor)
+            currentPos = currentToken
             term =  parseTermP()
             if(term):
                 childNodes.append(term)
                 return(Node("term-p", childNodes))
+            currentToken = currentPos
+            return(Node("term-p", childNodes))
     return None
 
 
 def parseMulop():
     if(nextToken() == TokenType.ASTERISK):
         return(Node("*"))
-    elif(tokenList[currentToken].SLASH):
+
+    elif(tokenList[currentToken] == TokenType.SLASH):
         return(Node("/"))
     return None
 
@@ -577,7 +584,7 @@ def parseArgList():
     childNodes = [parseExpression()]
     while(True):
         if(nextToken() == TokenType.COMMA):
-            childNodes.append(Node(","))
+            # childNodes.append(Node(","))
             childNodes.append(parseExpression())
         elif(getLastToken() == TokenType.CLOSE_PARENTHESIS):
             return childNodes
