@@ -62,6 +62,7 @@ def parseDeclarationList():
     childNodes = []
     while(True):
         if(tokenList[currentToken + 1] == TokenType.ENDFILE):
+            childNodes.append(Node("endfile"))
             break
         else:
             dc =  parseDeclaration()
@@ -242,6 +243,7 @@ def parseStatementList():
 def parseStatement():
     global currentToken
     currentPos = currentToken
+    childNodes = []
     exp = parseExpressionStmt()
     if(exp):
         return (Node("statement", exp))
@@ -260,7 +262,8 @@ def parseStatement():
     currentToken = currentPos
     exp = parseReturnStmt()
     if(exp):
-        return(Node("statement", exp))
+        childNodes.append(exp)
+        return(Node("statement", childNodes))
     currentToken = currentPos
 
     return None
@@ -333,7 +336,7 @@ def parseReturnStmt():
         childNodes.append(Node("return"))
         if(nextToken() ==  TokenType.SEMICOLON):
             childNodes.append(Node(";"))
-            return([Node("return-stmt", childNodes)])
+            return(Node("return-stmt", childNodes))
         else:
 
             currentToken -= 1
@@ -342,7 +345,7 @@ def parseReturnStmt():
             if(exp):
                 if(nextToken() == TokenType.SEMICOLON):
                     childNodes.append([exp, Node(";")])
-                    return([Node("return-stmt", childNodes)])
+                    return(Node("return-stmt", childNodes))
     return None
 
 def parseExpression():
@@ -487,7 +490,6 @@ def parseTerm():
 def parseTermP():
     global currentToken
     childNodes = []
-    print(tokenList[currentToken+1])
     mulop = parseMulop()
     if(mulop):
         childNodes.append(mulop)
