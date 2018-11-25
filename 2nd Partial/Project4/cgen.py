@@ -3,7 +3,7 @@ from semantica import *
 ''' Adrian Biller A01018940
 codigo basado en tutoriales de MIPS https://www.youtube.com/watch?v=0aexcR9CNcE'''
 
-
+2
 
 fileCode = []
 registry = {'$zero': None, '$v0': None, '$v1': None, '$a0':None, '$a1': None, '$a2': None, '$a3': None, '$t0': None, '$t1': None, '$t2':None,'$t3':None,'$t4':None,'$t5':None,'$t6':None,'$t7':None}
@@ -17,6 +17,10 @@ def codeGen(tree, file, level):
 
     if tree.type == "fun-declaration":
         print(tree.childNodes[1].value, ":")
+        print('     move $fp $sp')
+        print('     sw $ra 0($sp)')
+        print('     addiu $sp $sp ‐4')
+        codeGen(tree.childNodes[2][1], file, level +1)
 
 
     if tree.type == "call":
@@ -25,8 +29,15 @@ def codeGen(tree, file, level):
         elif tree.childNodes[0].value == 'output':
             output()
         else:
+            print('     sw $fp 0($sp)')
+            print('     addiu $sp $sp ‐4')
+            n = len(tree.childNodes[1].childNodes)-1
+            for i in range(n):
+                codeGen(tree.childNodes[1].childNodes[n-i], file, level+1)
+                print('     sw $fp 0($sp)')
+                print('     addiu $sp $sp ‐4')
             print("     jal ", tree.childNodes[0].value)
-            print(len(tree.childNodes[1].childNodes))
+            # print(len(tree.childNodes[1].childNodes))
 
 
     if tree.type == 'additive-expression' and len(tree.childNodes) == 2:
@@ -51,6 +62,7 @@ def codeGen(tree, file, level):
     if tree.type == 'iteration-stmt':
             print('     while:')
             codeGen(tree.childNodes[1], file, level +1)
+
             #todavia no se como poner el condicional
             codeGen(tree.childNodes[2], file, level +1)
             print('     j while')
@@ -61,7 +73,7 @@ def codeGen(tree, file, level):
             print('     beq $t0, $t1, true_branch')
         elif tree.childNodes[1].childNodes[1].childNodes[1].type  == '<=':
             print('     slt $d, $s, $t')
-            
+
         '''    return(Node("<="))
         elif(getLastToken() == TokenType.LESS_THAN):
             return(Node("<"))
@@ -82,6 +94,9 @@ def codeGen(tree, file, level):
 
     if(tree.type == 'return-stmt'):
         codeGen(tree.childNodes[1][0].childNodes[1], file, level +1)
+        print('     lw $fp 0($sp)')
+        print('     ')
+        print('     jr $ra')
         # codeGen(tree.childNodes[0].type)
 
 
@@ -109,14 +124,14 @@ def input():
     print('     li $v0, 5')
     print('     syscall')
     print('     move $t0, $v0')
-    print('     jr $ra')
+    # print('     jr $ra')
     return
 
 def output():
     print('     li $v0, 1')
     print('     move $a0, $t0')
     print('     syscall')
-    print('     jr $ra')
+    # print('     jr $ra')
 
 
 
@@ -256,6 +271,6 @@ if __name__ == '__main__':
     codeGen(AST, "codeGenerated.s", 0)
     print(registry)
     f= open("codeGenerated.s","w+")
-    f.write("his is jalowin")
-    for i in range(len())
+    f.write("MIPS generated code")
+
     f.close()
