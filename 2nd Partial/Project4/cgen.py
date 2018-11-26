@@ -5,13 +5,13 @@ codigo basado en tutoriales de MIPS https://www.youtube.com/watch?v=0aexcR9CNcE'
 
 
 fileCode = ["file"]
-registry = {'$zero': None, '$v0': None, '$v1': None, '$a0':None, '$a1': None, '$a2': None, '$a3': None, '$t0': None, '$t1': None, '$t2':None,'$t3':None,'$t4':None,'$t5':None,'$t6':None,'$t7':None}
+registry = {'$zero': None, '$v0': None, '$v1': None, '$a0':None, '$a1': None, '$a2': None, '$a3': None, '$t0': None, '$t1': None, '$t2':None,'$t3':None,'$t4':None,'$t5':None,'$t6':None,'$t7':None, '$s0': None, '$s1': None,'$s1': None,'$s3': None,'$s4': None,'$s5': None,'$s6': None,'$s7': None}
 def codeGen(tree, file, level =0):
     global fileCode
     # print((level*3)*'__', tree.type, " # ", tree.value)
     if tree.type == 'program':
         print('.text')
-        print('.align 2\n')
+        print('.align 2')
         print('.globl main')
         codeGen(tree.childNodes[0], file, level +1)
 
@@ -21,6 +21,10 @@ def codeGen(tree, file, level =0):
         print('     sw $ra 0($sp)')
         print('     addiu $sp $sp ‐4')
         codeGen(tree.childNodes[2][1], file, level +1)
+        print('     lw $ra 4($sp)')
+        print('     addiu $sp $sp z')
+        print('     lw $fp 0($sp)')
+        print('     jr $ra')
 
 
     elif tree.type == "call":
@@ -81,12 +85,13 @@ def codeGen(tree, file, level =0):
     elif tree.type == 'expression':
         if tree.childNodes[1].type == '=':
             codeGen(tree.childNodes[2], file, level)
-            print('     la ', getAvailableVar(), '($v1)')
+            print('     la ', getAvailableTempVar(), '($v1)')
 
     elif tree.type == 'iteration-stmt':
             print('     while:')
             codeGen(tree.childNodes[1], file, level +1)
             #todavia no se como poner el condicional
+            print('     exit')
             codeGen(tree.childNodes[2], file, level +1)
             print('     j while')
             print('     exit:')
@@ -127,9 +132,10 @@ def codeGen(tree, file, level =0):
         print('     jr $ra')
         # codeGen(tree.childNodes[0].type)
 
-    elif tree.type == 'int':
-        print("hola")
-        
+    elif tree.type == 'var-declaration':
+        # print(tree.childNodes[1].value)
+        print('     ori' + getAvailableVar(tree.childNodes[1].value) + ', 0')
+
 
     elif type(tree.childNodes) == list:
         for i in range(len(tree.childNodes)):
@@ -165,14 +171,19 @@ def output():
 
 
 
-def getAvailableVar():
+def getAvailableTempVar():
     for i in range(7):
         index = '$t' + str(7 - i)
         if(registry[index] == None):
             registry[index] = "in use"
             return index
 
-
+def getAvailableVar(var):
+    for i in range(7):
+        index = '$s' + str(i)
+        if(registry[index] == None):
+            registry[index] = "in use"
+            return index
 
 def generateFile(file):
     f= open(file,"w+")
