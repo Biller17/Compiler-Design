@@ -4,13 +4,14 @@ from semantica import *
 codigo basado en tutoriales de MIPS https://www.youtube.com/watch?v=0aexcR9CNcE'''
 
 
-fileCode = []
+fileCode = ["file"]
 registry = {'$zero': None, '$v0': None, '$v1': None, '$a0':None, '$a1': None, '$a2': None, '$a3': None, '$t0': None, '$t1': None, '$t2':None,'$t3':None,'$t4':None,'$t5':None,'$t6':None,'$t7':None}
-def codeGen(tree, file, level):
+def codeGen(tree, file, level =0):
     global fileCode
     # print((level*3)*'__', tree.type, " # ", tree.value)
     if tree.type == 'program':
         print('.text')
+        print('.align 2\n')
         print('.globl main')
         codeGen(tree.childNodes[0], file, level +1)
 
@@ -58,15 +59,29 @@ def codeGen(tree, file, level):
             print('	add $a0 $t1 $a0')
             print('	addiu $sp $sp 4')
 
-    elif tree.type == 'term':
-        print('multiplication')
+    elif tree.type == 'term' and len(tree.childNodes) > 1:
+        if tree.childNodes[1].type =='term-p':
+            if tree.childNodes[1].childNodes[0].type == '*':
+                codeGen(tree.childNodes[0], file, level +1)
+                print('     sw $a0 0($sp)')
+                print('     addiu $sp $sp ‐4')
+                codeGen(tree.childNodes[1].childNodes[1], file, level +1)
+                print('     lw $t1 4($sp)')
+                print('     mult $a0 $t1 $a0')
+                print('     addiu $sp $sp 4')
+            elif tree.childNodes[1].childNodes[0].type == '/':
+                codeGen(tree.childNodes[0], file)
+                print('      sw $a0 0($sp)')
+                print('      addiu $sp $sp ‐4')
+                codeGen(tree.childNodes[1].childNodes[1], file, level +1)
+                print('      lw $t1 4($sp)')
+                print('      div $a0 $t1 $a0')
+                print('      addiu $sp $sp 4')
 
     elif tree.type == 'expression':
         if tree.childNodes[1].type == '=':
             codeGen(tree.childNodes[2], file, level)
             print('     la ', getAvailableVar(), '($v1)')
-
-
 
     elif tree.type == 'iteration-stmt':
             print('     while:')
@@ -112,6 +127,10 @@ def codeGen(tree, file, level):
         print('     jr $ra')
         # codeGen(tree.childNodes[0].type)
 
+    elif tree.type == 'int':
+        print("hola")
+        
+
     elif type(tree.childNodes) == list:
         for i in range(len(tree.childNodes)):
             if(type(tree.childNodes[i]) == list):
@@ -121,9 +140,13 @@ def codeGen(tree, file, level):
             #     generateST(ast.childNodes[i] , currentScope)
             else:
                 codeGen(tree.childNodes[i],file, level +1)
+
     if tree.type == 'endfile':
         print('     li $v0, 10')
         print('     syscall')
+        generateFile(file)
+
+
 
 
 
@@ -146,134 +169,17 @@ def getAvailableVar():
     for i in range(7):
         index = '$t' + str(7 - i)
         if(registry[index] == None):
+            registry[index] = "in use"
             return index
 
 
-def codeGenREF(tree, file):
-	if tree:
-		# print('Nodo: {}. Tipo: {}'.format(tree.type, tree.tokenType))
 
-		# Init of the code
-		if tree.type == 'program':
-			print('	.text')
-			print('	.align 2')
-			print('	.globl main')
-			print('main:')
+def generateFile(file):
+    f= open(file,"w+")
+    for i in range(len(fileCode)):
+        f.write(fileCode[i])
 
-		if tree.type in opKind:
-			if tree.type == 'PLUS':
-				codeGen(tree.children[0], file)
-				print('	sw $a0 0($sp)')
-				print('	addiu $sp $sp ‐4')
-				codeGen(tree.children[1], file)
-				print('	lw $t1 4($sp)')
-				print('	add $a0 $t1 $a0')
-				print('	addiu $sp $sp 4')
-
-			elif tree.type == 'MINUS':
-				codeGen(tree.children[0], file)
-				print('	sw $a0 0($sp)')
-				print('	addiu $sp $sp ‐4')
-				codeGen(tree.children[1], file)
-				print('	lw $t1 4($sp)')
-				print('	sub $a0 $t1 $a0')
-				print('	addiu $sp $sp 4')
-
-			elif tree.type == 'TIMES':
-				codeGen(tree.children[0], file)
-				print('	sw $a0 0($sp)')
-				print('	addiu $sp $sp ‐4')
-				codeGen(tree.children[1], file)
-				print('	lw $t1 4($sp)')
-				print('	mult $a0 $t1 $a0')
-				print('	addiu $sp $sp 4')
-
-			elif tree.type == 'OVER':
-				codeGen(tree.children[0], file)
-				print('	sw $a0 0($sp)')
-				print('	addiu $sp $sp ‐4')
-				codeGen(tree.children[1], file)
-				print('	lw $t1 4($sp)')
-				print('	div $a0 $t1 $a0')
-				print('	addiu $sp $sp 4')
-
-			# ASSIGN
-
-
-		elif tree.type in compareKind:
-			if tree.type == 'EQ':
-				print('	beq $a0 $t1 true_branch')
-
-			elif tree.type == 'DF':
-				print('	bne $a0 $t1 true_branch')
-
-			elif tree.type == 'GET':
-				print('	bge $a0 $t1 true_branch')
-
-			elif tree.type == 'LET':
-				print('	ble $a0 $t1 true_branch')
-
-			elif tree.type == 'GT':
-				print('	bgt $a0 $t1 true_branch')
-
-			elif tree.type == 'LT':
-				print('	blt $a0 $t1 true_branch')
-
-		elif tree.type == 'statement':
-			if tree.children[0]:
-				actualNode = tree
-				if tree.children[0] and tree.children[0].tokenType == 'IF':
-					# Move to the compare instruction
-					tree = tree.children[1]
-					codeGen(tree.children[0], file)
-					print('	sw $a0 0($sp)')
-					print('	addiu $sp $sp -4')
-					codeGen(tree.children[1], file)
-					print('	lw $t1 4($sp)')
-					print('	addiu $sp $sp 4')
-					codeGen(tree, file)
-					print('false_brach:')
-
-					# If there is an ELSE
-					try:
-						codeGen(actualNode.children[4],file)
-					except IndexError:
-						pass
-					finally:
-						print('	b end_if')
-
-					print('true_brach:')
-					codeGen(actualNode.children[2], file)
-					print('end_if:')
-
-				elif tree.children[0].tokenType == 'WHILE':
-					# Move to the compare instruction
-					tree = tree.children[1]
-					print('begin_while:')
-					codeGen(tree.children[0], file)
-					print('	sw $a0 0($sp)')
-					print('	addiu $sp $sp -4')
-					codeGen(tree.children[1], file)
-					print('	lw $t1 4($sp)')
-					print('	addiu $sp $sp 4')
-					codeGen(tree, file)
-					print('	b end_while:')
-					print('true_branch:')
-					codeGen(actualNode.children[2], file)
-					print('	b begin_while')
-					print('end_while:')
-
-
-		elif tree.tokenType == 'ID':
-			pass
-
-		elif tree.tokenType == 'NUM':
-			print('	li $a0 {}'.format(tree.type))
-
-
-		for child in tree.children:
-			codeGen(child, file)
-
+    f.close()
 
 
 if __name__ == '__main__':
@@ -283,6 +189,7 @@ if __name__ == '__main__':
     codeGen(AST, "codeGenerated.s", 0)
     print(registry)
     f= open("codeGenerated.s","w+")
-    f.write("MIPS generated code")
+    for i in range(len(fileCode)):
+        f.write(fileCode[i])
 
     f.close()
