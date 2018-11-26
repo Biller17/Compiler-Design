@@ -65,7 +65,7 @@ def codeGen(tree, file, level):
         if tree.childNodes[1].type == '=':
             codeGen(tree.childNodes[2], file, level)
             # print("lkjfdsañññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññ")
-            print('     la ', getAvailableVar(), '($t0)')
+            print('     la ', getAvailableVar(), '($v1)')
 
 
 
@@ -107,7 +107,6 @@ def codeGen(tree, file, level):
 
 
     elif(tree.type == 'return-stmt'):
-        print("fdsssssss",tree.childNodes[1][0].type)
         codeGen(tree.childNodes[1][0].childNodes[1], file, level +1)
         print('     la $v0, $t3')
         print('     lw $fp 0($sp)')
