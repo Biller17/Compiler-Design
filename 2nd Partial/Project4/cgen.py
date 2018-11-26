@@ -64,7 +64,6 @@ def codeGen(tree, file, level):
     elif tree.type == 'expression':
         if tree.childNodes[1].type == '=':
             codeGen(tree.childNodes[2], file, level)
-            # print("lkjfdsañññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññ")
             print('     la ', getAvailableVar(), '($v1)')
 
 
