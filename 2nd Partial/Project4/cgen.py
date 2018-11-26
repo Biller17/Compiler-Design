@@ -3,19 +3,18 @@ from semantica import *
 ''' Adrian Biller A01018940
 codigo basado en tutoriales de MIPS https://www.youtube.com/watch?v=0aexcR9CNcE'''
 
-2
 
 fileCode = []
 registry = {'$zero': None, '$v0': None, '$v1': None, '$a0':None, '$a1': None, '$a2': None, '$a3': None, '$t0': None, '$t1': None, '$t2':None,'$t3':None,'$t4':None,'$t5':None,'$t6':None,'$t7':None}
 def codeGen(tree, file, level):
     global fileCode
-    print((level*3)*'__', tree.type, " # ", tree.value)
-    if tree.type == "program":
-    	print('	.text')
-    	print('	.globl main')
-    	# print('main:')
+    # print((level*3)*'__', tree.type, " # ", tree.value)
+    if tree.type == 'program':
+        print('.text')
+        print('.globl main')
+        codeGen(tree.childNodes[0], file, level +1)
 
-    if tree.type == "fun-declaration":
+    elif tree.type == "fun-declaration":
         print(tree.childNodes[1].value, ":")
         print('     move $fp $sp')
         print('     sw $ra 0($sp)')
@@ -23,7 +22,7 @@ def codeGen(tree, file, level):
         codeGen(tree.childNodes[2][1], file, level +1)
 
 
-    if tree.type == "call":
+    elif tree.type == "call":
         if tree.childNodes[0].value == 'input':
             input()
         elif tree.childNodes[0].value == 'output':
@@ -40,7 +39,7 @@ def codeGen(tree, file, level):
             # print(len(tree.childNodes[1].childNodes))
 
 
-    if tree.type == 'additive-expression' and len(tree.childNodes) == 2:
+    elif tree.type == 'additive-expression' and len(tree.childNodes) == 2:
         if tree.childNodes[1].childNodes[0].type == '-':
             # print(tree.childNodes[0].type)
             codeGen(tree.childNodes[0], file, level+1)
@@ -59,53 +58,63 @@ def codeGen(tree, file, level):
             print('	add $a0 $t1 $a0')
             print('	addiu $sp $sp 4')
 
-    if tree.type == 'iteration-stmt':
+    elif tree.type == 'term':
+        print('multiplication')
+
+    elif tree.type == 'expression':
+        if tree.childNodes[1].type == '=':
+            codeGen(tree.childNodes[2], file, level)
+            # print("lkjfdsañññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññññ")
+            print('     la ', getAvailableVar(), '($t0)')
+
+
+
+    elif tree.type == 'iteration-stmt':
             print('     while:')
             codeGen(tree.childNodes[1], file, level +1)
-
             #todavia no se como poner el condicional
             codeGen(tree.childNodes[2], file, level +1)
             print('     j while')
             print('     exit:')
 
-    if(tree.type == 'selection-stmt'):
+    elif(tree.type == 'selection-stmt'):
         if tree.childNodes[1].childNodes[1].childNodes[1].type  == '==':
             print('     beq $t0, $t1, true_branch')
-        elif tree.childNodes[1].childNodes[1].childNodes[1].type  == '<=':
-            print('     slt $d, $s, $t')
+        elif tree.childNodes[1].childNodes[1].childNodes[1].type  == '<':
+            print('     slt $t3,$t1,$t0') #s0 > s1
+            print('     beq $t3, 1 true_branch')
+        elif tree.childNodes[1].childNodes[1].childNodes[1].type == '>':
+            print('     slt $t3,$t1,$t0') #s0 < s1
+            print('     beq $t3, 0 true_branch')
+        elif tree.childNodes[1].childNodes[1].childNodes[1].type  == '=<':
+            print('     beq $t0, $t1, true_branch')
+            print('     slt $t3,$t1,$t0') #s0 > s1
+            print('     beq $t3, 1 true_branch')
+        elif tree.childNodes[1].childNodes[1].childNodes[1].type == '=>':
+            print('     beq $t0, $t1, true_branch')
+            print('     slt $t3,$t1,$t0') #s0 < s1
+            print('     beq $t3, 0 true_branch')
+        elif tree.childNodes[1].childNodes[1].childNodes[1].type == '!=':
+            print('     beq $t0, $t1, false_branch')
 
-        '''    return(Node("<="))
-        elif(getLastToken() == TokenType.LESS_THAN):
-            return(Node("<"))
-        elif(getLastToken() == TokenType.GREATER_THAN):
-            return(Node(">"))
-        elif(getLastToken() == TokenType.GREATER_THAN_EQUAL_TO):
-            return(Node(">="))
-        elif(getLastToken() == TokenType.EQUAL):
-            return(Node("=="))
-        elif(getLastToken() == TokenType.DIFFERENT):
-            return(Node("!="))'''
         if tree.childNodes[3].type == 'else':
             print('false_branch:')
             codeGen(tree.childNodes[4], file, level+1)
             print('     b end_if')
         print("true_branch:")
         codeGen(tree.childNodes[2], file, level +1)
+        print("end_if:")
 
-    if(tree.type == 'return-stmt'):
+
+    elif(tree.type == 'return-stmt'):
+        print("fdsssssss",tree.childNodes[1][0].type)
         codeGen(tree.childNodes[1][0].childNodes[1], file, level +1)
+        print('     la $v0, $t3')
         print('     lw $fp 0($sp)')
-        print('     ')
         print('     jr $ra')
         # codeGen(tree.childNodes[0].type)
 
-
-
-
-
-
-
-    if type(tree.childNodes) == list:
+    elif type(tree.childNodes) == list:
         for i in range(len(tree.childNodes)):
             if(type(tree.childNodes[i]) == list):
                 for j in range(len(tree.childNodes[i])):
@@ -135,6 +144,11 @@ def output():
 
 
 
+def getAvailableVar():
+    for i in range(7):
+        index = '$t' + str(7 - i)
+        if(registry[index] == None):
+            return index
 
 
 def codeGenREF(tree, file):
