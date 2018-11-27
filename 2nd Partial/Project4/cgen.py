@@ -8,7 +8,7 @@ fileCode = ["file"]
 registry = {'$zero': None, '$v0': None, '$v1': None, '$a0':None, '$a1': None, '$a2': None, '$a3': None, '$t0': None, '$t1': None, '$t2':None,'$t3':None,'$t4':None,'$t5':None,'$t6':None,'$t7':None, '$s0': None, '$s1': None,'$s1': None,'$s3': None,'$s4': None,'$s5': None,'$s6': None,'$s7': None}
 def codeGen(tree, file, level =0):
     global fileCode
-    # print((level*3)*'__', tree.type, " # ", tree.value)
+    # print((level*3)*'__', tree.type)
     if tree.type == 'program':
         print('.text')
         print('.align 2')
@@ -134,7 +134,7 @@ def codeGen(tree, file, level =0):
 
     elif tree.type == 'var-declaration':
         # print(tree.childNodes[1].value)
-        print('     ori' + getAvailableVar(tree.childNodes[1].value) + ', 0')
+        print('     ori ' + getAvailableVar(tree.childNodes[1].value) + ', 0')
 
 
     elif type(tree.childNodes) == list:
@@ -146,7 +146,6 @@ def codeGen(tree, file, level =0):
             #     generateST(ast.childNodes[i] , currentScope)
             else:
                 codeGen(tree.childNodes[i],file, level +1)
-
     if tree.type == 'endfile':
         print('     li $v0, 10')
         print('     syscall')
